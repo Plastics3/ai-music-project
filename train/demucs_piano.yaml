@@ -1,0 +1,67 @@
+name: demucs_piano
+description: "Demucs v4 model trained for piano separation"
+
+# --------------------------
+# Model
+# --------------------------
+model:
+  type: htdemucs
+  sources:
+    - piano                       # <--- Your only target stem
+  audio_channels: 2
+  sample_rate: 44100
+  segment: 12                     # seconds per training chunk
+  stride: 0.1
+  channels: 64
+  growth: 2
+  depth: 6
+  resample: 4
+  resample_kernel: 64
+  normalize: true
+  kernel_size: 8
+  conv_normalization: weight_norm
+  lstm_layers: 2
+  lstm_channels: 128
+  time_shuffle: 2
+
+# --------------------------
+# Training Parameters
+# --------------------------
+training:
+  batch_size: 4
+  epochs: 160
+  lr: 3e-4
+  lr_decay: 0.99
+  weight_decay: 1e-5
+  optimizer: adam
+  grad_clip: 0.5
+  random_chunks: true
+  random_amplify: true
+
+# --------------------------
+# Data
+# --------------------------
+data:
+  train: data/train
+  valid: data/valid
+  sample_rate: 44100
+
+  # These files must exist under train/ and valid/
+  mixtures: mixture.wav
+  sources:
+    piano: piano.wav
+
+augment:
+  shift: 1.0
+  scale: 0.25
+  remix: 0.75
+  flip_channels: true
+  invert_phase: true
+
+# --------------------------
+# Checkpoints / Output
+# --------------------------
+save:
+  checkpoint_every: 10
+  keep_last: 5
+  output_dir: checkpoints_piano
